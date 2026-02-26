@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Evaluation and Trajectory Testing — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART XXI</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART XXI</div>
+  <h1>Agent Evaluation and Trajectory Testing</h1>
+</div>
+
+<article>
+<h2>21.1  Why Agent Evals Are Different</h2>
+<p>Task evals measure whether a system produces the right output for a given input. Agent evals measure whether a system made good decisions along the way to producing that output. A LangGraph agent that arrives at the correct final answer by making three unnecessary tool calls, hallucinating an intermediate step, and getting lucky on the last attempt has a perfect task eval score and a failing agent eval score. In production, that agent will fail on harder variants of the same problem.</p>
+<p>The unit of agent evaluation is the trajectory: the full sequence of states, decisions, and actions from initial input to final output. Trajectory evaluation asks whether each step was correct, necessary, and coherent given the available information at that point.</p>
+<h2>21.2  Trajectory Logging</h2>
+<p>Before you can evaluate trajectories, you have to capture them. Every LangGraph node should emit a structured log event with: the current state (relevant fields only, not the full context window), the decision made, the tool called and its arguments, the tool result, and the timestamp.</p>
+<pre><code>from dataclasses import dataclass, asdict
+from datetime import datetime</code></pre>
+<pre><code>@dataclass
+class TrajectoryStep:
+    step_id: int
+    node_name: str
+    state_summary: dict
+    decision: str
+    tool_name: str | None
+    tool_args: dict | None
+    tool_result: str | None
+    timestamp: str = None</code></pre>
+<pre><code>    def __post_init__(self):
+        if not self.timestamp:
+            self.timestamp = datetime.utcnow().isoformat()</code></pre>
+<pre><code># In each LangGraph node
+def search_node(state: AgentState) -&gt; AgentState:
+    result = search_tool(state[&#x27;query&#x27;])
+    log_trajectory_step(TrajectoryStep(
+        step_id=state[&#x27;step_count&#x27;],
+        node_name=&#x27;search&#x27;,
+        state_summary={&#x27;query&#x27;: state[&#x27;query&#x27;]},
+        decision=&#x27;called search&#x27;,
+        tool_name=&#x27;search&#x27;,
+        tool_args={&#x27;query&#x27;: state[&#x27;query&#x27;]},
+        tool_result=result[:500]
+    ))
+    return {**state, &#x27;search_results&#x27;: result}</code></pre>
+<h2>21.3  The Four Trajectory Metrics</h2>
+<p>Four metrics cover most trajectory evaluation needs:</p>
+<h3>Tool Use Precision</h3>
+<p>What fraction of tool calls were actually necessary? An agent that calls the search tool five times when one call would have sufficed has low tool use precision. Measure by having a human or LLM-judge annotate whether each tool call was necessary given the information already in state.</p>
+<h3>Step Efficiency</h3>
+<p>How many steps did the agent take relative to the optimal path? For tasks with known optimal paths (from your eval suite), compute the ratio of actual steps to optimal steps. A ratio consistently above 1.3 indicates the agent is looping or exploring unnecessarily.</p>
+<h3>Decision Coherence</h3>
+<p>Did each decision follow logically from the available information at that step? This is the hardest metric to compute automatically — it requires a judge model that evaluates whether the decision at step N was reasonable given the state at step N. LLM-as-judge works well here because the evaluation is local (each step in isolation) rather than global (the whole trajectory).</p>
+<h3>Graceful Abandonment Rate</h3>
+<p>When the agent cannot complete the task, does it stop cleanly and explain why, or does it loop until max_steps? A well-designed agent should detect when it is stuck and abandon gracefully. Track the fraction of failed tasks that ended in a clean abandonment versus a max_steps termination.</p>
+<h2>21.4  LLM-as-Judge for Trajectory Evaluation</h2>
+<p>For open-ended agent tasks, LLM-as-judge is the practical solution for trajectory evaluation at scale. The judge receives: the original task, the trajectory (as a structured JSON log), and a rubric. It outputs a score and a reasoning trace.</p>
+<p>The judge rubric for agent trajectories should evaluate: did the agent understand the task correctly (initial intent classification), did it gather the right information (tool use quality), did it avoid unnecessary steps (efficiency), and did the final answer address the task (outcome quality). Weight these according to your task type.</p>
+<p>A critical discipline: run your judge model evals on a held-out set of human-annotated trajectories to calibrate its scoring. If the judge scores strongly agree with human scores on the calibration set, trust the judge for the full eval suite. If they diverge, adjust the rubric before using the judge in production.</p>
+</article>
+
+<div class="page-nav">
+  <a href="part-20.html" class="nav-btn">← PART XX</a>
+  <a href="part-22.html" class="nav-btn">PART XXII →</a>
+</div>
+
+</body>
+</html>

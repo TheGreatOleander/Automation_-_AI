@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structured Outputs and Reliable Extraction — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART XVIII</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART XVIII</div>
+  <h1>Structured Outputs and Reliable Extraction</h1>
+</div>
+
+<article>
+<h2>18.1  Why Structured Outputs Are the Foundation of Reliable Automation</h2>
+<p>The most common source of production failures in AI automation is not model quality — it is output parsing. An automation that expects JSON and receives a markdown code block with JSON inside it fails. An automation that expects a yes/no classification and receives &#x27;Based on the content, I would say...&#x27; fails. Structured outputs eliminate this entire class of failure.</p>
+<p>The principle is simple: never let your automation depend on parsing free text if you can define the output schema in advance. Every major AI provider now supports structured output modes. Use them by default.</p>
+<h2>18.2  JSON Mode and Function Calling</h2>
+<p>Most AI APIs support two mechanisms for structured output: JSON mode (the model is constrained to output valid JSON) and function calling / tool use (the model is constrained to output arguments matching a defined schema).</p>
+<p>JSON mode is the lighter-weight option. Provide a JSON schema in your system prompt, enable JSON mode, and the API guarantees valid JSON output. The weakness: it guarantees syntactic validity, not semantic validity. The model can output valid JSON that does not match your schema.</p>
+<p>Tool use / function calling is stronger. Define your output as a tool the model &#x27;calls&#x27;, and the API enforces schema compliance at the field level. This is the right approach for production.</p>
+<pre><code>import anthropic
+from pydantic import BaseModel</code></pre>
+<pre><code>class ClassificationResult(BaseModel):
+    category: str
+    confidence: float  # 0.0 to 1.0
+    reasoning: str</code></pre>
+<pre><code>client = anthropic.Anthropic()
+response = client.messages.create(
+    model=&#x27;claude-sonnet-4-6&#x27;,
+    max_tokens=256,
+    tools=[{
+        &#x27;name&#x27;: &#x27;classify&#x27;,
+        &#x27;description&#x27;: &#x27;Classify the input text&#x27;,
+        &#x27;input_schema&#x27;: ClassificationResult.model_json_schema()
+    }],
+    tool_choice={&#x27;type&#x27;: &#x27;tool&#x27;, &#x27;name&#x27;: &#x27;classify&#x27;},
+    messages=[{&#x27;role&#x27;: &#x27;user&#x27;, &#x27;content&#x27;: text}]
+)
+result = ClassificationResult(**response.content[0].input)</code></pre>
+<h2>18.3  Instructor: Pydantic Validation for AI Outputs</h2>
+<p>Instructor is a Python library that wraps the Anthropic and OpenAI clients to add Pydantic validation, automatic retry on validation failure, and partial extraction. It is the most practical library for structured output in production AI automation.</p>
+<pre><code>import instructor
+from anthropic import Anthropic
+from pydantic import BaseModel, Field, field_validator</code></pre>
+<pre><code>class TaskExtraction(BaseModel):
+    title: str = Field(max_length=100)
+    priority: str = Field(pattern=&#x27;^(low|medium|high|critical)$&#x27;)
+    due_days: int = Field(ge=0, le=365)
+    tags: list[str] = Field(max_items=5)</code></pre>
+<pre><code>    @field_validator(&#x27;title&#x27;)
+    def title_not_empty(cls, v):
+        if not v.strip(): raise ValueError(&#x27;title cannot be empty&#x27;)
+        return v.strip()</code></pre>
+<pre><code>client = instructor.from_anthropic(Anthropic())
+task = client.messages.create(
+    model=&#x27;claude-sonnet-4-6&#x27;,
+    max_tokens=512,
+    response_model=TaskExtraction,
+    messages=[{&#x27;role&#x27;: &#x27;user&#x27;, &#x27;content&#x27;: raw_input}]
+)</code></pre>
+<p>If the model returns output that fails Pydantic validation, Instructor automatically retries with the validation error included in the prompt. This is the retry behaviour you want: not a blind retry, but an informed correction.</p>
+<h2>18.4  Partial Extraction and Streaming</h2>
+<p>For long documents where you need to extract information as it streams, Instructor supports partial models. A partial model allows field values to be populated incrementally as the stream arrives, enabling your downstream code to start working with early fields before the full extraction completes.</p>
+<p>This pattern is particularly valuable for extraction from long documents (contracts, reports, transcripts) where the first fields (title, date, parties) are available early in the stream and have downstream dependencies.</p>
+<h2>18.5  Output Validation Pipelines</h2>
+<p>Even with structured outputs, a validation pipeline before any irreversible action is worth the overhead. The pipeline has three stages: schema validation (handled by Pydantic), business logic validation (custom rules: is this date in the future? does this account exist?), and semantic validation (does the extracted intent match the source? this is the LLM-as-judge layer for high-stakes actions).</p>
+<p>Irreversible actions — sending emails, making financial transactions, deleting records, calling external APIs with side effects — should always pass all three validation stages before executing. For reversible actions (writing a draft, updating a local cache), schema validation alone is usually sufficient.</p>
+</article>
+
+<div class="page-nav">
+  <a href="part-17.html" class="nav-btn">← PART XVII</a>
+  <a href="part-19.html" class="nav-btn">PART XIX →</a>
+</div>
+
+</body>
+</html>

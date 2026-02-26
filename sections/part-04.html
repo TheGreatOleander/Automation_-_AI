@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>n8n: Production Workflow Architecture — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART IV</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART IV</div>
+  <h1>n8n: Production Workflow Architecture</h1>
+</div>
+
+<article>
+<h2>4.1  n8n Data Model in Depth</h2>
+<p>Understanding n8n&#x27;s data model is the prerequisite for building reliable workflows. Data flows between nodes as an array of items. Each item has a json property (the main payload) and optionally a binary property (for files). Every node receives the full array from the previous node and outputs a (possibly transformed) array.</p>
+<h3>The Split/Merge Problem</h3>
+<p>When you need to process items individually (e.g., call an AI API once per item), use the &#x27;Execute Once Per Item&#x27; setting or a loop pattern. When you need to collect results from a loop back into a single item, use the Merge node. Failing to manage split/merge correctly is the most common n8n mistake.</p>
+<h2>4.2  Sub-Workflows: Modularity in n8n</h2>
+<p>Large n8n workflows become unmaintainable. The solution: sub-workflows. A workflow can call another workflow using the &#x27;Execute Workflow&#x27; node, passing data and receiving results. This allows shared logic (AI classification, notification sending, error handling) to be defined once and called from many workflows.</p>
+<h2>4.3  n8n and Redis: Event-Driven Workflows</h2>
+<p>n8n&#x27;s built-in triggers handle scheduled and webhook events well. For high-frequency, real-time event processing, pair n8n with Redis pub/sub. A lightweight publisher writes to a Redis channel; an n8n workflow with a Redis Trigger node fires immediately on each message.</p>
+<h2>4.4  n8n Credentials and Multi-Environment Management</h2>
+<p>n8n stores credentials encrypted in its database. For multi-environment setups (development, staging, production), use environment variables for the encryption key and configure credentials programmatically via the n8n API rather than the UI.</p>
+<h2>4.5  Zapier and Make: When Not to Self-Host</h2>
+<p>n8n&#x27;s self-hosting requirement is a strength (privacy, control) and a weakness (infrastructure burden). Zapier and Make (formerly Integromat) are cloud-hosted alternatives. Knowing when each is appropriate:</p>
+</article>
+
+<div class="page-nav">
+  <a href="part-03.html" class="nav-btn">← PART III</a>
+  <a href="part-05.html" class="nav-btn">PART V →</a>
+</div>
+
+</body>
+</html>

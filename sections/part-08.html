@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LangChain, LlamaIndex, and AI Orchestration Frameworks — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART VIII</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART VIII</div>
+  <h1>LangChain, LlamaIndex, and AI Orchestration Frameworks</h1>
+</div>
+
+<article>
+<h2>8.1  Why AI Orchestration Frameworks Exist</h2>
+<p>LangChain and LlamaIndex emerged to solve the same problem: the gap between &#x27;call an AI API&#x27; and &#x27;build a production AI application&#x27;. Connecting to vector stores, managing conversation history, chaining multiple AI calls, routing between tools — these patterns repeat across every AI application. The frameworks provide them pre-built.</p>
+<p>The important caveat: these frameworks add abstraction. Abstraction is valuable when it hides complexity you don&#x27;t need to control. It is costly when it hides behaviour you do need to understand. Know what the framework is doing before trusting it in production.</p>
+<h2>8.2  LangChain: Composable AI Chains</h2>
+<p>LangChain&#x27;s core abstraction is the chain: a sequence of components (prompt templates, models, output parsers, tools) that can be composed with the pipe operator. The LCEL (LangChain Expression Language) syntax makes this readable.</p>
+<h3>LangChain Memory</h3>
+<h2>8.3  LlamaIndex: Retrieval-Augmented Generation</h2>
+<p>LlamaIndex is specialised for retrieval-augmented generation (RAG): indexing documents, generating embeddings, storing them in a vector database, and retrieving relevant chunks at query time. This is the standard architecture for &#x27;ask questions about your documents&#x27; use cases.</p>
+<h2>8.4  LangGraph: Stateful Agent Architectures</h2>
+<p>LangGraph is the most important framework for complex AI automation. Where LangChain chains are linear (A → B → C), LangGraph supports cycles, conditionals, and persistent state — the structures needed for real agents that loop, branch, and remember.</p>
+<p>The mental model: LangGraph is a state machine where each node is a function that reads the state, does work (possibly calling an LLM), and returns updates to the state. The graph defines transitions — which node runs next based on current state.</p>
+<h2>8.5  CrewAI and AutoGen: Multi-Agent Frameworks</h2>
+<p>CrewAI and AutoGen provide higher-level abstractions for multi-agent systems — collections of AI agents with different roles and capabilities working together on a task. These are appropriate when a task genuinely requires specialisation (one agent researches, another writes, another edits) and when the coordination overhead is justified by the task complexity.</p>
+</article>
+
+<div class="page-nav">
+  <a href="part-07.html" class="nav-btn">← PART VII</a>
+  <a href="part-09.html" class="nav-btn">PART IX →</a>
+</div>
+
+</body>
+</html>

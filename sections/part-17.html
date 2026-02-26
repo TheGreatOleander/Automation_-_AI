@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observability, Monitoring, and Production Telemetry — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART XVII</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART XVII</div>
+  <h1>Observability, Monitoring, and Production Telemetry</h1>
+</div>
+
+<article>
+<h2>17.1  Why AI Systems Need Different Observability</h2>
+<p>Traditional software observability asks: did the function execute, and how long did it take? AI automation observability asks something harder: did the system do the right thing? A workflow that completes in 200ms and returns a plausible-looking string may have hallucinated, misclassified, or silently degraded. Standard uptime monitors will not catch it.</p>
+<p>The three pillars of AI observability extend the classic logs/metrics/traces framework with AI-specific additions: token cost per workflow, model output quality scores, and semantic drift detection. Every production AI automation system needs all six.</p>
+<h2>17.2  OpenTelemetry for AI Automation</h2>
+<p>OpenTelemetry (OTel) is the open standard for distributed tracing. Instrumenting your AI automation with OTel gives you a complete picture of every request: which node processed it, how long each step took, what was passed between components, and where failures originated.</p>
+<p>The key AI-specific trace attributes to attach to every span:</p>
+<ul>
+<li>model: the model name and version used</li>
+<li>input_tokens / output_tokens: token counts for cost attribution</li>
+<li>cost_usd: computed cost for this call</li>
+<li>latency_ms: wall-clock time including retry delays</li>
+<li>retry_count: number of retries before success or failure</li>
+<li>quality_score: LLM-as-judge score if available</li>
+</ul>
+<pre><code>from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter</code></pre>
+<pre><code>provider = TracerProvider()
+provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
+trace.set_tracer_provider(provider)
+tracer = trace.get_tracer(&#x27;ai_automation&#x27;)</code></pre>
+<pre><code>with tracer.start_as_current_span(&#x27;llm_call&#x27;) as span:
+    span.set_attribute(&#x27;model&#x27;, &#x27;claude-opus-4-6&#x27;)
+    span.set_attribute(&#x27;input_tokens&#x27;, prompt_tokens)
+    result = call_model(prompt)
+    span.set_attribute(&#x27;output_tokens&#x27;, result.usage.output_tokens)
+    span.set_attribute(&#x27;cost_usd&#x27;, compute_cost(result.usage))</code></pre>
+<h2>17.3  The Four Metrics Every AI Automation Needs</h2>
+<p>The minimum viable metrics suite for a production AI automation system consists of four instrument types. Anything less leaves you flying blind in production.</p>
+<h3>Throughput</h3>
+<p>Tasks processed per minute, broken down by task type. This tells you whether your system is keeping up with demand. A sudden drop in throughput usually indicates a stuck worker, a queue backlog, or an upstream API slowdown.</p>
+<h3>Error Rate</h3>
+<p>Failures per 100 tasks, broken down by failure type. AI systems have two distinct error categories: hard failures (API timeout, malformed response, authentication error) and soft failures (model output failed validation, quality score below threshold). Track both separately — they have different causes and different fixes.</p>
+<h3>Latency Distribution</h3>
+<p>P50, P95, and P99 latency for each task type. AI API latency is highly variable — P99 can be 10x P50. Monitoring only averages will hide the long tail that users actually experience.</p>
+<h3>Cost per Unit</h3>
+<p>Dollar cost per task, per workflow, per day. This is the metric that will surprise you in production. Set budget alerts before you deploy. A workflow that processes an unexpectedly large document, gets retried three times, and triggers a downstream email summarisation chain can cost 100x a typical run.</p>
+<h2>17.4  Grafana + Prometheus: The Self-Hosted Stack</h2>
+<p>For self-hosted AI automation, the standard observability stack is Prometheus (metrics collection), Grafana (visualisation and alerting), and Loki (log aggregation). Add these to your Docker Compose stack:</p>
+<pre><code># docker-compose.yml additions
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports: [&#x27;9090:9090&#x27;]</code></pre>
+<pre><code>  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports: [&#x27;3000:3000&#x27;]</code></pre>
+<pre><code>  loki:
+    image: grafana/loki:latest
+    ports: [&#x27;3100:3100&#x27;]</code></pre>
+<p>Expose metrics from your Python workers using the prometheus_client library. A /metrics endpoint on each worker is all Prometheus needs.</p>
+<h2>17.5  Alerting That Actually Works</h2>
+<p>Bad alerting is worse than no alerting. Alert on symptoms, not causes — and only on symptoms that require human action within your response time window.</p>
+<p>The four alert tiers for AI automation systems:</p>
+<ul>
+<li>Critical (page immediately): Cost rate exceeds 3x baseline; all workers dead; queue depth exceeds 1-hour capacity</li>
+<li>High (notify within 15 minutes): Error rate above 5% for 10 minutes; P99 latency above 30 seconds; any task in dead letter queue</li>
+<li>Medium (notify within 1 hour): Quality scores trending down over 24 hours; model fallback activated; vector store freshness degraded</li>
+<li>Low (daily digest): Individual task failures; cost efficiency changes; queue depth trends</li>
+</ul>
+<p>Configure Grafana alert rules to route to ntfy, PagerDuty, or your chosen channel. The runbook link in every alert is not optional — it transforms a 2am page from a panic into a procedure.</p>
+<h2>17.6  Semantic Drift Detection</h2>
+<p>Model providers update their models. Your prompts age. The real-world distribution of inputs shifts. Any of these can cause silent quality degradation — your automation keeps running, costs stay flat, but the outputs are getting worse.</p>
+<p>Semantic drift detection runs your eval suite on a schedule (weekly minimum, daily for high-stakes systems) and alerts when quality scores drop. The implementation: store the eval suite results from your last known-good deployment. Compare current scores to that baseline. If any metric drops by more than your threshold (typically 5-10%), open an incident.</p>
+<p>This is the AI-specific monitoring layer that has no analogue in traditional software. Do not skip it.</p>
+</article>
+
+<div class="page-nav">
+  <a href="part-16.html" class="nav-btn">← PART XVI</a>
+  <a href="part-18.html" class="nav-btn">PART XVIII →</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Automation Manual v3.0 — The Whole Word</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0d12;
+    --bg2:       #0f1318;
+    --grid:      rgba(255,160,50,0.03);
+    --orange:    #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:      #f0c040;
+    --rust:      #c45a20;
+    --text:      #d4c9bc;
+    --text-dim:  #5c5248;
+    --border:    rgba(255,154,60,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1100px; height: 650px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 10;
+    padding: 80px 40px 64px;
+    max-width: 1140px; margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; text-transform: uppercase;
+    margin-bottom: 28px;
+    opacity: 0; animation: fadeUp 0.6s ease forwards 0.1s;
+  }
+  .badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(44px, 7vw, 96px);
+    line-height: 0.92; letter-spacing: -1px;
+    text-transform: uppercase; color: #ffffff;
+    opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s;
+  }
+  h1 .accent { color: var(--orange); }
+  h1 .sub {
+    font-weight: 300; font-size: 0.48em;
+    display: block; color: var(--text-dim);
+    letter-spacing: 3px; margin-top: 10px;
+  }
+  .meta {
+    margin-top: 32px; display: flex; gap: 36px; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s;
+  }
+  .meta-item {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; color: var(--text-dim);
+  }
+  .meta-item span { color: var(--gold); margin-right: 6px; }
+  .preface-note {
+    margin-top: 36px; padding: 22px 28px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.03);
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 700px;
+    opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s;
+  }
+  .preface-note strong { color: var(--text); font-style: normal; font-weight: 500; }
+
+  /* ── STATS ── */
+  .stats {
+    position: relative; z-index: 10;
+    max-width: 1140px; margin: 0 auto;
+    padding: 32px 40px;
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+    opacity: 0; animation: fadeUp 0.6s ease forwards 0.65s;
+  }
+  .stat {
+    flex: 1; text-align: center; padding: 0 20px;
+    border-right: 1px solid var(--border);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 40px; font-weight: 600;
+    color: var(--orange); line-height: 1;
+  }
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase; margin-top: 5px;
+  }
+
+  /* ── MAIN ── */
+  main {
+    position: relative; z-index: 10;
+    max-width: 1140px; margin: 0 auto;
+    padding: 64px 40px 120px;
+  }
+
+  /* ── PART GROUP ── */
+  .part-group {
+    margin-bottom: 64px;
+    opacity: 0; transform: translateY(24px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .group-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 4px;
+    color: var(--orange-dim); text-transform: uppercase;
+    margin-bottom: 20px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── CARDS ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 2px;
+  }
+  .card {
+    display: block; text-decoration: none;
+    padding: 24px 28px;
+    background: var(--bg2);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--rust), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .card:hover { border-color: var(--border); background: rgba(255,154,60,0.03); }
+  .card:hover::before { opacity: 1; }
+  .card-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--orange-dim);
+    letter-spacing: 2px; margin-bottom: 10px;
+  }
+  .card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px; font-weight: 500;
+    color: #e8ddd0; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .card-desc {
+    font-family: 'Lora', serif;
+    font-size: 13.5px; color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .card-arrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px; color: var(--orange-dim);
+    margin-top: 16px; transition: color 0.2s;
+  }
+  .card:hover .card-arrow { color: var(--orange); }
+  .card.appendix .card-num { color: var(--gold); opacity: 0.6; }
+  .card.new .card-num::after {
+    content: ' NEW'; color: var(--orange); margin-left: 8px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 10;
+    border-top: 1px solid var(--border);
+    padding: 32px 40px;
+    max-width: 1140px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .footer-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--text-dim); letter-spacing: 1px;
+  }
+  .footer-text a { color: var(--orange-dim); text-decoration: none; }
+  .footer-text a:hover { color: var(--orange); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .part-group:nth-child(1) { animation-delay: 0.7s; }
+  .part-group:nth-child(2) { animation-delay: 0.82s; }
+  .part-group:nth-child(3) { animation-delay: 0.94s; }
+  .part-group:nth-child(4) { animation-delay: 1.06s; }
+  .part-group:nth-child(5) { animation-delay: 1.18s; }
+  .part-group:nth-child(6) { animation-delay: 1.30s; }
+  .part-group:nth-child(7) { animation-delay: 1.42s; }
+  .part-group:nth-child(8) { animation-delay: 1.54s; }
+  .part-group:nth-child(9) { animation-delay: 1.66s; }
+  .part-group:nth-child(10){ animation-delay: 1.78s; }
+
+  @media (max-width: 640px) {
+    header, main, .stats, footer { padding-left: 20px; padding-right: 20px; }
+    .stat-num { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">THE WHOLE WORD ON AI AUTOMATION</div>
+  <h1>
+    AI <span class="accent">Automation</span><br>Manual
+    <span class="sub">Operator Edition v3.0 · February 2026</span>
+  </h1>
+  <div class="meta">
+    <div class="meta-item"><span>◈</span> 25 PARTS</div>
+    <div class="meta-item"><span>◈</span> FROM TASKER TO MULTI-AGENT</div>
+    <div class="meta-item"><span>◈</span> INCL. CODE VOLLEYBALL</div>
+    <div class="meta-item"><span>◈</span> THE AKASHA PROJECT</div>
+  </div>
+  <div class="preface-note">
+    From a single Tasker task to a distributed multi-agent system. <strong>Written by AI, compiled by a human.</strong>
+    The Akasha project — the Android AI bridge, semantic compression, multi-session memory — runs through this manual as a lived example.
+    Every abstract principle has a concrete instantiation in a real system.
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">25</div>
+    <div class="stat-label">Parts</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">23</div>
+    <div class="stat-label">New Sections</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">XVI</div>
+    <div class="stat-label">Original Parts</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">v3</div>
+    <div class="stat-label">Edition</div>
+  </div>
+</div>
+
+<main>
+
+  <!-- GROUP 0: START HERE -->
+  <div class="part-group">
+    <div class="group-label">00 // Start Here</div>
+    <div class="cards">
+      <a class="card" href="sections/preface.html">
+        <div class="card-num">PREFACE</div>
+        <div class="card-title">The Whole Word</div>
+        <div class="card-desc">Why this manual exists. The Akasha project as worked example. The standard this manual holds itself to.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 1: FOUNDATIONS -->
+  <div class="part-group">
+    <div class="group-label">01 // Foundations</div>
+    <div class="cards">
+      <a class="card" href="sections/part-01.html">
+        <div class="card-num">PART I</div>
+        <div class="card-title">The Automation Stack: First Principles</div>
+        <div class="card-desc">The five-layer mental model. Trigger taxonomy. Data contracts. Idempotency. The outbox pattern. Backpressure. The economics of automation.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/part-16.html">
+        <div class="card-num">PART XVI</div>
+        <div class="card-title">Complete Reference</div>
+        <div class="card-desc">The full decision tree for new automations. Tool selection matrix. Master command reference. Extended glossary.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 2: MOBILE & DESKTOP AUTOMATION -->
+  <div class="part-group">
+    <div class="group-label">02 // Mobile &amp; Desktop Automation</div>
+    <div class="cards">
+      <a class="card" href="sections/part-02.html">
+        <div class="card-num">PART II</div>
+        <div class="card-title">Tasker: Android Automation at Depth</div>
+        <div class="card-desc">Production Tasker architecture. The complete Akasha Bridge. Compound conditions, variable-gated profiles. Tasker + Termux. iOS Shortcuts. AutoHotkey, KDE Connect, Raycast.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/part-03.html">
+        <div class="card-num">PART III</div>
+        <div class="card-title">Open Interpreter: Deep Integration</div>
+        <div class="card-desc">The feedback loop architecture. Custom computer backends. Running in Docker. Streaming output.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 3: WORKFLOW ORCHESTRATION -->
+  <div class="part-group">
+    <div class="group-label">03 // Workflow Orchestration</div>
+    <div class="cards">
+      <a class="card" href="sections/part-04.html">
+        <div class="card-num">PART IV</div>
+        <div class="card-title">n8n: Production Workflow Architecture</div>
+        <div class="card-desc">n8n data model. The split/merge problem. Sub-workflows. Redis event-driven workflows. Multi-environment credential management. Zapier and Make.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/part-05.html">
+        <div class="card-num">PART V</div>
+        <div class="card-title">GitHub Actions, Makefiles, and the CI Layer</div>
+        <div class="card-desc">CI as an automation platform. Composite actions. Makefiles as AI task runners. Environments and protection rules. Caching for AI projects.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/part-08.html">
+        <div class="card-num">PART VIII</div>
+        <div class="card-title">LangChain, LlamaIndex, and AI Frameworks</div>
+        <div class="card-desc">Why orchestration frameworks exist. LangChain chains. LlamaIndex RAG. LangGraph stateful agents. CrewAI and AutoGen multi-agent.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 4: INFRASTRUCTURE -->
+  <div class="part-group">
+    <div class="group-label">04 // Infrastructure</div>
+    <div class="cards">
+      <a class="card" href="sections/part-06.html">
+        <div class="card-num">PART VI</div>
+        <div class="card-title">Bash and Python: The Craft Layer</div>
+        <div class="card-desc">Environment management. Async Python for AI. Mocking AI for testing. Debugging non-deterministic systems. Deterministic replay. Seed control.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/part-07.html">
+        <div class="card-num">PART VII</div>
+        <div class="card-title">Redis and Celery: Distributed Task Infrastructure</div>
+        <div class="card-desc">Redis as backbone. Data structures for AI automation. Celery task queues. Dead letter queues. Airflow and Prefect for DAG orchestration.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/part-09.html">
+        <div class="card-num">PART IX</div>
+        <div class="card-title">Model Context Protocol (MCP)</div>
+        <div class="card-desc">What MCP is and why it matters. MCP architecture: hosts, clients, servers. Building an MCP server in Python. Connecting to Claude Desktop.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/part-10.html">
+        <div class="card-num">PART X</div>
+        <div class="card-title">Docker Compose: The Complete AI Stack</div>
+        <div class="card-desc">Infrastructure as code for AI systems. The complete automation stack. Health checks and startup order. Notification infrastructure: ntfy, Pushover.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/part-13.html">
+        <div class="card-num">PART XIII</div>
+        <div class="card-title">Edge Functions, Webhooks, and Real-Time Transport</div>
+        <div class="card-desc">Cloudflare Workers for AI automation. WebSockets vs SSE vs polling. Schema versioning and migration.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 5: SECURITY & COMPLIANCE -->
+  <div class="part-group">
+    <div class="group-label">05 // Security &amp; Compliance</div>
+    <div class="cards">
+      <a class="card" href="sections/part-11.html">
+        <div class="card-num">PART XI</div>
+        <div class="card-title">Security, Privacy, and Compliance</div>
+        <div class="card-desc">The AI-specific threat model. Prompt injection at scale. PII detection and redaction. Local processing for sensitive data. GDPR/HIPAA compliance checklist. Secrets management at scale.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 6: QUALITY & COST -->
+  <div class="part-group">
+    <div class="group-label">06 // Quality &amp; Cost</div>
+    <div class="cards">
+      <a class="card" href="sections/part-12.html">
+        <div class="card-num">PART XII</div>
+        <div class="card-title">Cost Modeling and Evaluation-Driven Development</div>
+        <div class="card-desc">Token cost accounting. The local vs cloud decision framework. Evaluation-driven development. The eval suite structure. LLM-as-judge for open-ended evals.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card new" href="sections/part-17.html">
+        <div class="card-num">PART XVII</div>
+        <div class="card-title">Observability, Monitoring, and Production Telemetry</div>
+        <div class="card-desc">OpenTelemetry for AI. The four core metrics. Grafana + Prometheus self-hosted stack. Alerting that works. Semantic drift detection.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card new" href="sections/part-18.html">
+        <div class="card-num">PART XVIII</div>
+        <div class="card-title">Structured Outputs and Reliable Extraction</div>
+        <div class="card-desc">JSON mode vs function calling. Instructor + Pydantic validation. Partial extraction for streaming. Output validation pipelines.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card new" href="sections/part-21.html">
+        <div class="card-num">PART XXI</div>
+        <div class="card-title">Agent Evaluation and Trajectory Testing</div>
+        <div class="card-desc">Why agent evals differ. Trajectory logging. The four trajectory metrics. LLM-as-judge calibration for agent decisions.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 7: ADVANCED AGENTS -->
+  <div class="part-group">
+    <div class="group-label">07 // Advanced Agent Patterns</div>
+    <div class="cards">
+      <a class="card" href="sections/part-14.html">
+        <div class="card-num">PART XIV</div>
+        <div class="card-title">Advanced Agent Patterns</div>
+        <div class="card-desc">The ReAct pattern. Circuit breakers for AI dependencies. Graceful degradation. Context window management at scale: sliding window, summary compression, hierarchical memory.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 8: LOCAL MODELS & VECTOR STORES -->
+  <div class="part-group">
+    <div class="group-label">08 // Local Models &amp; Vector Stores</div>
+    <div class="cards">
+      <a class="card new" href="sections/part-19.html">
+        <div class="card-num">PART XIX</div>
+        <div class="card-title">Local Model Deployment with Ollama</div>
+        <div class="card-desc">When local is the right choice. Ollama setup and model management. Quantization tradeoffs. The local-first fallback chain. Ollama in Docker Compose.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card new" href="sections/part-20.html">
+        <div class="card-num">PART XX</div>
+        <div class="card-title">Vector Databases in Production</div>
+        <div class="card-desc">pgvector vs Qdrant vs Chroma. HNSW vs IVF index types. Hybrid search with BM25. Re-ranking with cross-encoders. Operational maintenance runbook.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 9: CODE VOLLEYBALL -->
+  <div class="part-group">
+    <div class="group-label">09 // The Prompt Ledger &amp; Code Volleyball</div>
+    <div class="cards">
+      <a class="card new" href="sections/part-22.html">
+        <div class="card-num">PART XXII</div>
+        <div class="card-title">The Prompt Ledger and Automated Code Generation</div>
+        <div class="card-desc">Code Volleyball: AI as a relay race. The anatomy of a Prompt Ledger. LEDGER.md template. Multi-model relay strategy. The Build Prompt. Automating the relay as a pipeline. Prompt engineering for relay contexts. Version control integration.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- GROUP 10: OPERATIONS -->
+  <div class="part-group">
+    <div class="group-label">10 // Operations &amp; Decision-Making</div>
+    <div class="cards">
+      <a class="card" href="sections/part-15.html">
+        <div class="card-num">PART XV</div>
+        <div class="card-title">Operational Runbooks</div>
+        <div class="card-desc">Runbook format. High API cost spike. Vector store drift. LangGraph agent loop. Tasker bridge stopped responding.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card new" href="sections/part-23.html">
+        <div class="card-num">PART XXIII</div>
+        <div class="card-title">The Automation Decision Checklist</div>
+        <div class="card-desc">Qualitative criteria for not automating. Stakes, input distribution, invisible failure, relational cost. The 10-point pre-deployment checklist.</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a class="card" href="sections/addendum.html">
+        <div class="card-num">ADDENDUM</div>
+        <div class="card-title">The Whole Word on Building Systems</div>
+        <div class="card-desc">The closing. Why Code Volleyball works. Build deliberately. Instrument everything. Know when to hand back to a human.</div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-text">AI Automation Manual v3.0 · February 2026</div>
+  <div class="footer-text">Written by AI · Compiled by a human · The Compiler</div>
+</footer>
+
+</body>
+</html>

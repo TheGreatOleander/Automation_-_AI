@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Automation Decision Checklist — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART XXIII</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART XXIII</div>
+  <h1>The Automation Decision Checklist</h1>
+</div>
+
+<article>
+<h2>23.1  Qualitative Criteria for Not Automating</h2>
+<p>The economics framework in Part I covers the quantitative case for automation. This section covers the cases where the numbers favour automation but other factors counsel against it.</p>
+<h3>When the Stakes Are Too High</h3>
+<p>Automate decisions only when the cost of a wrong decision is recoverable. Sending a draft email to an internal Slack channel — recoverable. Sending a draft email to 50,000 customers — not recoverable. Publishing a social media post — recoverable if caught quickly. Executing a financial transaction — not recoverable. The threshold for human review before irreversible action should be lower than your intuition suggests, especially for AI automation where errors can be both silent and correlated.</p>
+<h3>When the Input Distribution Is Unbounded</h3>
+<p>Automation works well when the space of possible inputs is well-defined and your evaluation suite covers it adequately. It fails when inputs can arrive in forms the automation has never encountered. Customer-facing systems, systems that process arbitrary external documents, and systems that interact with adversarial actors all face unbounded input distributions. For these, automation handles the common case and routes the uncommon case to humans rather than attempting to handle everything.</p>
+<h3>When Failure Is Invisible</h3>
+<p>The most dangerous automation failure mode is silent degradation — the automation keeps running, metrics look normal, but outputs are wrong. Before deploying any automation, answer this question: how will I know when it is wrong? If you cannot answer it, you are not ready to deploy.</p>
+<h3>When the Relationship Matters More Than the Task</h3>
+<p>Some tasks have instrumental value and relational value. Responding to a customer complaint resolves the complaint (instrumental) and demonstrates that a human cared (relational). Automating the response delivers the instrumental value and sacrifices the relational value. For high-value relationships, the relational cost of full automation often exceeds the efficiency gain.</p>
+<h2>23.2  The Pre-Deployment Automation Checklist</h2>
+<p>Before any automation touches production:</p>
+<ul>
+<li>Can you describe the failure modes? List at least five ways it can go wrong.</li>
+<li>Is there a monitoring strategy for each failure mode? Who gets alerted and how fast?</li>
+<li>Is there a kill switch? Can you disable the automation in under 60 seconds?</li>
+<li>Is there an audit trail? Can you reconstruct what the automation did and why for any past run?</li>
+<li>Is the blast radius bounded? What is the worst-case impact of the automation running incorrectly for one hour?</li>
+<li>Has the evaluation suite passed? Has it passed on a held-out test set, not just the training set?</li>
+<li>Is there a rollback plan? If the automation causes a problem, can you revert to the pre-automation state?</li>
+<li>Has a human reviewed its outputs on representative inputs? Not just &#x27;does it run&#x27; but &#x27;does it do the right thing&#x27;?</li>
+<li>Are the stakeholders informed? Does everyone affected by this automation know it exists?</li>
+<li>Is the operational burden accounted for? Who will maintain this automation and how much time does that take?</li>
+</ul>
+<p>A &#x27;no&#x27; on any of these is not a reason to abandon the automation — it is a reason to fix the gap before deploying.</p>
+</article>
+
+<div class="page-nav">
+  <a href="part-22.html" class="nav-btn">← PART XXII</a>
+  <a href="addendum.html" class="nav-btn">ADDENDUM →</a>
+</div>
+
+</body>
+</html>

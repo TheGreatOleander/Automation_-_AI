@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasker: Android Automation at Depth — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART II</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART II</div>
+  <h1>Tasker: Android Automation at Depth</h1>
+</div>
+
+<article>
+<h2>2.1  Architecture of a Production Tasker System</h2>
+<p>Tasker&#x27;s power is proportional to the discipline you bring to it. A production Tasker system — one that handles real data, calls real APIs, and runs reliably for months — requires explicit architectural choices that casual automations do not.</p>
+<p>The three structural principles for production Tasker:</p>
+<ul>
+<li>Separation of concerns: one profile per trigger type; one task per logical operation. Never combine unrelated logic in a single task.</li>
+<li>Explicit state management: all state lives in named globals with a consistent naming convention. Ephemeral state uses local variables, cleared at task end.</li>
+<li>Error paths as first-class citizens: every task has an explicit failure branch that logs the error and sets a known error state variable.</li>
+</ul>
+<h2>2.2  The Complete Akasha Bridge Architecture</h2>
+<p>The full production bridge — what the Akasha project implements — has eight components:</p>
+<ul>
+<li>Input capture (clipboard intercept, text-share intent, file watcher)</li>
+<li>Input validation and sanitisation (JavaScriptlet, schema check)</li>
+<li>Session lookup (read thread history from file)</li>
+<li>Context compression (if history exceeds token limit)</li>
+<li>Routing (classify task type, select model/endpoint)</li>
+<li>API call (HTTP Request with retry logic)</li>
+<li>Response processing and persistence (write session file, write output)</li>
+<li>Notification (toast, notification, or write response flag)</li>
+</ul>
+<h2>2.3  Advanced Profile Conditions</h2>
+<h3>Compound Conditions</h3>
+<p>Tasker profiles can have multiple conditions (AND logic by default). Use this to create highly specific triggers that avoid false positives — the leading cause of runaway automations.</p>
+<h3>Variable-Gated Profiles</h3>
+<p>Set a global variable as a lock to prevent concurrent execution. Critical for profiles that write files or call APIs, where concurrent execution would corrupt state.</p>
+<h2>2.4  Tasker + Termux: Full Linux on Android</h2>
+<p>Termux provides a Linux environment on Android, and Tasker can invoke Termux commands. This combination turns your Android device into a full Linux automation host: you can run Python scripts, bash pipelines, cURL calls, and even a local HTTP server — all triggered by Tasker profiles.</p>
+<h2>2.5  iOS Shortcuts: The Apple Equivalent</h2>
+<p>iOS Shortcuts is Apple&#x27;s automation platform, equivalent in intent to Tasker but different in architecture. Shortcuts actions are visual blocks. Automation triggers are more limited (time, app open, NFC tap, focus mode) but are expanding each OS release. For AI automation specifically, Shortcuts can call any HTTP API.</p>
+<p>Shortcuts lacks Tasker&#x27;s power for local state management and complex logic, but it integrates natively with the Apple ecosystem: iCloud, Calendar, Reminders, Contacts, and on-device models (iOS 18+ with Apple Intelligence). For cross-platform systems, Shortcuts and Tasker can communicate via shared HTTP endpoints or cloud files.</p>
+<h3>iOS Shortcuts Limitations</h3>
+<ul>
+<li>No equivalent of JavaScriptlet — logic is limited to visual blocks and basic scripting</li>
+<li>Background execution is restricted; long-running HTTP calls may be interrupted</li>
+<li>No access to clipboard contents without explicit user tap (privacy restriction)</li>
+<li>Automation triggers are fewer and less precise than Tasker profiles</li>
+</ul>
+<h2>2.6  Desktop Automation: AutoHotkey and KDE Connect</h2>
+<h3>AutoHotkey (Windows)</h3>
+<p>AutoHotkey is the Windows equivalent of Tasker for desktop automation: global hotkeys, window management, clipboard manipulation, mouse and keyboard scripting, and HTTP requests. For AI automation on Windows, it provides the capture and notify layers.</p>
+<h3>KDE Connect (Linux/Android Bridge)</h3>
+<p>KDE Connect bridges an Android device and a Linux desktop: it enables bidirectional clipboard sync, remote command execution, file transfer, and notification sharing. For AI automation, this allows Tasker to trigger scripts on your Linux machine and receive results, without a custom HTTP server.</p>
+<h3>Raycast and Alfred (macOS)</h3>
+<p>Raycast and Alfred are macOS launchers that have become serious AI automation hubs. Both support custom scripts (bash, Python, Node.js) triggered by keyword. Raycast has native AI features (paid tier). Alfred&#x27;s Workflows can construct complex multi-step automations triggered from the keyboard.</p>
+</article>
+
+<div class="page-nav">
+  <a href="part-01.html" class="nav-btn">← PART I</a>
+  <a href="part-03.html" class="nav-btn">PART III →</a>
+</div>
+
+</body>
+</html>

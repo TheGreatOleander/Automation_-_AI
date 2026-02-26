@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Automation Stack: First Principles — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART I</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART I</div>
+  <h1>The Automation Stack: First Principles</h1>
+</div>
+
+<article>
+<h2>1.1  The Mental Model</h2>
+<p>Every AI automation system, regardless of its tools or scale, can be described with five questions: What wakes it? What does it know? What does it decide? What does it do? What does it remember? These map directly to five architectural layers:</p>
+<p>Every tool in this manual lives in one or more of these layers. Understanding which layer a tool occupies tells you how it connects to everything else. Confusion about layer ownership is the root cause of most architectural mistakes in AI automation.</p>
+<h2>1.2  Trigger Taxonomy</h2>
+<p>Triggers are not interchangeable. The choice of trigger determines the system&#x27;s latency, resource profile, and failure characteristics. The four canonical trigger types:</p>
+<h3>Schedule Triggers</h3>
+<p>Fire at predetermined intervals. Implemented with cron (Linux), Windows Task Scheduler, Tasker time profiles, GitHub Actions schedule, Airflow DAG schedule. Latency equals half the interval on average. Resource-efficient because the system is idle between runs. The weakness: a schedule cannot respond to events that arrive between runs.</p>
+<h3>Event Triggers</h3>
+<p>Fire when something specific happens in the environment. Filesystem events (inotify, FSEvents), network events (webhook, socket), user events (clipboard, keypress, app open). Zero latency from event to response. Requires always-on monitoring process. Prone to event storms when many events arrive simultaneously.</p>
+<h3>Reactive / Pull Triggers</h3>
+<p>A polling loop checks for new work at a fixed interval. Simpler than true event triggers because it does not require a persistent listener. The trade-off: latency equals the poll interval, and polling consumes resources even when there is no work.</p>
+<h3>Manual / Dispatch Triggers</h3>
+<p>A human or upstream system explicitly starts the automation. GitHub Actions workflow_dispatch, Tasker manual task run, n8n manual execution, a CLI command. Essential for debugging and for workflows that require human judgment before starting.</p>
+<h2>1.3  The Data Contract</h2>
+<p>Every boundary between layers in your automation system is a contract. A contract specifies: the format of the data (JSON, CSV, binary), the schema (required fields, types, constraints), the version, and the error format. Violating a contract silently is the most common cause of production failures in automation systems.</p>
+<h2>1.4  Idempotency: The Most Important Property</h2>
+<p>An idempotent operation produces the same result whether it is run once or ten times. In automation, idempotency is not optional — networks fail, processes crash, and automations re-run. A non-idempotent automation that re-runs will send duplicate emails, create duplicate records, or make duplicate API calls.</p>
+<p>Design every automation step to be idempotent by default:</p>
+<ul>
+<li>Use upsert (insert-or-update) instead of insert</li>
+<li>Key outputs by a deterministic ID derived from the input (hash of content, timestamp + source)</li>
+<li>Check for prior completion before executing (the progress file pattern)</li>
+<li>Write outputs to a deterministic path that will be overwritten, not appended</li>
+</ul>
+<h2>1.5  The Outbox Pattern: Never Lose Data</h2>
+<p>Network calls fail. API endpoints go down. The naive approach — call the API, then mark the task complete — loses data when the call succeeds but the acknowledgment fails, or when the call fails after partial execution. The outbox pattern eliminates this class of failure.</p>
+<p>Write-to-local-first, then sync. The automation writes its intent to a local outbox (a file, a database row, a Redis key) before making any external call. A separate process reads the outbox and makes the calls, marking entries as delivered only after confirmation. If the process crashes, undelivered entries remain in the outbox and will be retried.</p>
+<h2>1.6  Backpressure: What Happens When You&#x27;re Overwhelmed</h2>
+<p>When producers generate work faster than consumers can process it, queues grow unboundedly, memory exhausts, and systems fail catastrophically. Backpressure is the mechanism by which a consumer signals to its producer to slow down.</p>
+<p>In AI automation, backpressure typically manifests as API rate limit errors (HTTP 429) or as growing queues of unprocessed items. The correct response is not to retry immediately — that makes the problem worse — but to implement an explicit capacity limit and refuse new work when the limit is reached.</p>
+<h2>1.7  The Economics of Automation</h2>
+<p>AI automation has real costs. Token costs accumulate. Compute costs for self-hosted models are real. Engineering time for building and maintaining automation is significant. A system that saves 10 minutes per day but costs $50/month in API calls and 20 hours to build pays back in years, not weeks.</p>
+<p>The framework for evaluating automation economics:</p>
+<ul>
+<li>Measure the baseline cost of the manual process (time × frequency × human hourly rate)</li>
+<li>Estimate the automation cost: build time + monthly API tokens + infrastructure</li>
+<li>Calculate break-even: build cost ÷ monthly savings</li>
+<li>Add a maintenance budget: automation requires ongoing attention; budget 15–25% of build time per year</li>
+<li>Add a reliability discount: automation that fails 10% of the time recovers only 90% of the potential savings</li>
+</ul>
+</article>
+
+<div class="page-nav">
+  <a href="preface.html" class="nav-btn">← PREFACE</a>
+  <a href="part-02.html" class="nav-btn">PART II →</a>
+</div>
+
+</body>
+</html>

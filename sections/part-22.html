@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Prompt Ledger and Automated Code Generation — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout.stop {
+    border-left-color: #c84040;
+    background: rgba(200,64,64,0.04); color: #904040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART XXII</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART XXII</div>
+  <h1>The Prompt Ledger and Automated Code Generation</h1>
+</div>
+
+<article>
+<h2>22.1  The Core Insight: AI as a Relay Race, Not a Sprint</h2>
+<p>The naive approach to AI-assisted code generation is conversational: describe what you want, read the output, paste it somewhere, repeat. This works for small tasks. It fails for systems. The reason is simple: no single AI context window can hold enough context to build a complex system coherently, and no single pass can produce production-quality code without review.</p>
+<p>Code Volleyball solves both problems. The pattern: one AI model writes code, a second reviews and extends it, the third reviews the second&#x27;s work and continues further. Each model brings a fresh context, catches the previous model&#x27;s blind spots, and adds depth. The human orchestrates the relay — zipping the project state, writing the next prompt, passing the baton — rather than doing the implementation work themselves.</p>
+<p>The critical infrastructure that makes this work is the Prompt Ledger: a structured document embedded in the project zip that carries the current state of the build, the decisions made, the decisions deferred, the known issues, and the next prompt. Without the ledger, each model starts cold. With the ledger, each model starts informed.</p>
+<h2>22.2  The Anatomy of a Prompt Ledger</h2>
+<p>A prompt ledger is a Markdown file (LEDGER.md) in the root of your project. It has six sections:</p>
+<h3>Project Charter</h3>
+<p>What is this system? What is the one-sentence description of what it does? What are the hard constraints (language, framework, deployment target, performance requirements)? This section does not change between passes — it anchors every model to the same north star.</p>
+<h3>Architecture Decisions Log</h3>
+<p>Every significant technical decision, in order, with a brief rationale. Why SQLite instead of PostgreSQL? Why Celery instead of a simple queue? Why did we choose this schema? Models can second-guess earlier decisions without this log. With it, they understand the reasoning and extend coherently rather than refactoring what is already settled.</p>
+<h3>Current Build State</h3>
+<p>What files exist and what does each one do? Which sections are complete, which are stubs, which are known-broken? This is the project map. A model reading this section knows immediately what exists and what still needs to be done.</p>
+<h3>Open Issues</h3>
+<p>Numbered list of known problems, incomplete implementations, and deferred decisions. Each issue has: a description, the file and line number it relates to (if applicable), a proposed resolution (if known), and a priority (must fix before next pass / nice to have / deferred).</p>
+<h3>Completed in This Pass</h3>
+<p>What did the previous model do? Which open issues did it close? What new files did it create? This section is written by each model at the end of its pass and read by the next model at the start. It is the handoff note.</p>
+<h3>Next Pass Prompt</h3>
+<p>The exact instruction for the next model. Written by the previous model (or by the human orchestrator). It specifies: which open issues to address, which components to build next, what constraints to observe, and what the success criterion is for the next pass. This is the most important section — it is the directive that drives each relay leg.</p>
+<h2>22.3  The Code Volleyball Workflow</h2>
+<p>The full workflow for a Code Volleyball build:</p>
+<ul>
+<li>Write the initial LEDGER.md with the Project Charter and the first Next Pass Prompt. The first prompt should ask for the skeleton: directory structure, key interfaces, dependency manifest, and empty implementations for each major component.</li>
+<li>Create a zip archive: zip -r project_v1.zip . (from the project root). Include all files — code, config, LEDGER.md.</li>
+<li>Open a new AI session. Upload the zip. The opening instruction is always the same: &#x27;Read LEDGER.md first. Follow the Next Pass Prompt. When you are done, update the Current Build State, close the issues you addressed, list what you completed, and write the Next Pass Prompt for the following model.&#x27;</li>
+<li>Download or copy the output. Unzip into your project directory, merging with the existing files. Inspect the changes.</li>
+<li>Zip again and repeat from step 3 with a fresh model session, or with the same model if you want to continue in context.</li>
+</ul>
+<p>The key discipline: each pass should have a bounded scope. &#x27;Build the entire application&#x27; is not a pass. &#x27;Implement the task queue consumer and its retry logic, add tests for happy path and dead letter queue, and update LEDGER.md&#x27; is a pass. Bounded passes produce coherent, reviewable output. Unbounded passes produce sprawling code that is difficult to verify.</p>
+<h2>22.4  LEDGER.md Template</h2>
+<p>Copy this template to the root of every Code Volleyball project:</p>
+<pre><code># LEDGER.md — [Project Name]</code></pre>
+<pre><code>## Project Charter
+**What this is:** [One sentence description]
+**Tech stack:** [Language, framework, key dependencies]
+**Deployment target:** [Where this runs]
+**Hard constraints:** [Non-negotiable requirements]
+**Out of scope:** [Explicit exclusions]</code></pre>
+<pre><code>## Architecture Decisions Log
+| # | Decision | Rationale | Date |
+|---|----------|-----------|------|
+| 1 | [What was decided] | [Why] | [Date] |</code></pre>
+<pre><code>## Current Build State
+### Files
+| File | Status | Description |
+|------|--------|-------------|
+| main.py | Complete | Entry point, CLI parsing |
+| worker.py | Stub | Task queue consumer — not implemented |</code></pre>
+<pre><code>### Completion %: ~[N]%</code></pre>
+<pre><code>## Open Issues
+1. [MUST] Description — file:line — Proposed fix
+2. [NICE] Description — file:line — Proposed fix
+3. [DEFERRED] Description — Notes</code></pre>
+<pre><code>## Completed in This Pass
+- [To be filled in by the model at end of pass]</code></pre>
+<pre><code>## Next Pass Prompt
+You are continuing an existing codebase. Read all files before writing any code.</code></pre>
+<pre><code>Your task this pass:
+1. [Specific task 1]
+2. [Specific task 2]
+3. Update LEDGER.md — close addressed issues, update build state,
+   write the Next Pass Prompt for the following model.</code></pre>
+<pre><code>Constraints:
+- [Constraint 1]
+- Do not refactor anything not mentioned in your task list.
+- If you find an issue not in the Open Issues list, add it; do not silently fix it.</code></pre>
+<h2>22.5  Multi-Model Relay Strategy</h2>
+<p>Different models have different strengths. A sophisticated Code Volleyball workflow assigns pass types to models based on their capabilities:</p>
+<ul>
+<li>Architecture and design passes: use the most capable reasoning model available. The goal is good decisions, not fast code. Claude Opus or GPT-4o.</li>
+<li>Implementation passes: use a strong coding model. Speed matters here. Claude Sonnet, GPT-4o, or Gemini 1.5 Pro.</li>
+<li>Review and hardening passes: use a model specifically prompted as a code reviewer. Ask it to find bugs, missing error handling, untested paths, and security issues. Rotating the reviewer model catches different classes of issues.</li>
+<li>Test writing passes: dedicate a pass specifically to test generation. Ask the model to read the implementation and write tests that would catch the open issues and the edge cases the implementation handles. Tests from a fresh model context are more adversarial than tests written by the model that wrote the implementation.</li>
+</ul>
+<h2>22.6  The Build Prompt</h2>
+<p>The Build Prompt is a companion to the Ledger — a separate BUILDPROMPT.md that an automated process or human can use to reconstitute the full project context from scratch. Where the Ledger tracks state across passes, the Build Prompt describes the project in a way that a model with no prior context can understand and contribute to.</p>
+<p>A good Build Prompt has three parts: a technical brief (what the system does, for whom, with what constraints), a component map (what each file does and how components connect), and the model&#x27;s role (what it is being asked to do and what it should not touch).</p>
+<p>The distinction matters: the Ledger is a changelog; the Build Prompt is the specification. Together, they allow any sufficiently capable model to pick up where any previous model left off, without knowledge of the conversation history.</p>
+<h2>22.7  Automating the Relay: Code Volleyball as a Pipeline</h2>
+<p>Once you have the Ledger and Build Prompt pattern established, the relay can itself be automated. An n8n workflow (or a Python script) can orchestrate the full loop: unzip the project, inject it into an API call, parse the model&#x27;s output, apply the file changes, update the ledger, zip, and trigger the next pass.</p>
+<p>The automation adds a quality gate between passes: run the test suite after each pass. If tests pass, continue to the next pass. If tests fail, log the failures, append them to the Open Issues section of the Ledger, and either retry the pass with the failure context or halt and notify a human.</p>
+<pre><code># Pseudocode for automated Code Volleyball
+def run_volleyball_pass(project_zip: Path, pass_config: dict) -&gt; Path:
+    # Unzip and read LEDGER.md
+    files = extract_project(project_zip)
+    ledger = read_ledger(files[&#x27;LEDGER.md&#x27;])</code></pre>
+<pre><code>    # Build the model prompt
+    prompt = build_prompt(ledger, pass_config, files)</code></pre>
+<pre><code>    # Call the model with all files as context
+    response = call_model(
+        model=pass_config[&#x27;model&#x27;],
+        system=pass_config[&#x27;system_prompt&#x27;],
+        user_content=attach_files(prompt, files)
+    )</code></pre>
+<pre><code>    # Apply the model&#x27;s output to the file tree
+    updated_files = apply_output(files, response)</code></pre>
+<pre><code>    # Run quality gate
+    test_results = run_tests(updated_files)
+    if test_results.failed:
+        append_failures_to_ledger(updated_files[&#x27;LEDGER.md&#x27;], test_results)</code></pre>
+<pre><code>    # Zip the updated project
+    return zip_project(updated_files, project_zip.stem + &#x27;_next&#x27;)</code></pre>
+<h2>22.8  Prompt Engineering for Relay Contexts</h2>
+<p>Models reading a code relay context need specific priming to perform well. Three principles:</p>
+<p>First, always instruct the model to read before writing. &#x27;Read all files completely before writing any code&#x27; is not obvious to a model that has been trained to be immediately helpful. Without this instruction, models frequently start generating code based on the Ledger description alone and miss important details already implemented.</p>
+<p>Second, make the scope boundary explicit and repeated. State at the start and end of the prompt what the model should not touch. &#x27;Do not refactor code outside your task scope&#x27; and &#x27;If you discover an issue outside your scope, add it to the Open Issues list — do not fix it&#x27; prevents the scope creep that derails relay builds.</p>
+<p>Third, require a structured handoff. &#x27;Before submitting, update LEDGER.md with: (1) what you completed, (2) any new issues you found, (3) the Next Pass Prompt for the following model.&#x27; This ensures the ledger stays current and the next pass has a clear directive. A model that completes its task but does not update the ledger is a relay runner who forgets to pass the baton.</p>
+<h2>22.9  Version Control Integration</h2>
+<p>Each volleyball pass should correspond to a git commit. The commit message should be the &#x27;Completed in This Pass&#x27; section of the updated Ledger — a precise, structured description of what changed. This turns your git history into a machine-readable record of the build process.</p>
+<pre><code># After each pass, commit with the ledger summary
+git add .
+git commit -m &quot;$(python3 -c \
+  import re, sys; \
+  txt = open(&#x27;LEDGER.md&#x27;).read(); \
+  m = re.search(r&#x27;## Completed in This Pass\n(.+?)\n## &#x27;, txt, re.DOTALL); \
+  print(m.group(1).strip()[:200] if m else &#x27;Volleyball pass&#x27;) \
+&#x27;)&quot;</code></pre>
+<p>Tag each pass that passes the quality gate: git tag volleyball-pass-N. This creates clean checkpoints for rollback and makes it easy to bisect regressions across passes.</p>
+<h2>22.10  When Not to Use Code Volleyball</h2>
+<p>Code Volleyball excels at iterative, well-scoped engineering tasks where quality accumulates across passes. It is the wrong tool for: one-shot scripts (faster to prompt directly), highly interdependent refactors (the model in pass N cannot see what pass N+1 will change), real-time pair programming (synchronous back-and-forth is faster than zip-and-relay), and tasks that require long continuous context (some problems genuinely require a single model to hold the entire codebase in context simultaneously).</p>
+<p>The smell that suggests Code Volleyball is appropriate: the task has multiple separable components, you expect to need several rounds of review and refinement, and the total scope exceeds what you are comfortable doing in a single prompt.</p>
+</article>
+
+<div class="page-nav">
+  <a href="part-21.html" class="nav-btn">← PART XXI</a>
+  <a href="part-23.html" class="nav-btn">PART XXIII →</a>
+</div>
+
+</body>
+</html>
