@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Agent Triad — AI Automation Manual v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=Oswald:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:       #0a0d12;
+    --bg2:      #0f1318;
+    --grid:     rgba(255,160,50,0.03);
+    --orange:   #ff9a3c;
+    --orange-dim:#7a4a1a;
+    --gold:     #f0c040;
+    --rust:     #c45a20;
+    --text:     #d4c9bc;
+    --text-dim: #5c5248;
+    --border:   rgba(255,154,60,0.15);
+    --code-bg:  #080b0f;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-weight: 400;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,154,60,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,13,18,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .topnav-home {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    text-decoration: none; letter-spacing: 2px;
+  }
+  .topnav-home:hover { color: #fff; }
+  .topnav-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 400;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; text-align: center;
+  }
+  .topnav-part {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange-dim);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 72px 40px 52px;
+    border-bottom: 1px solid var(--border);
+  }
+  .part-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--orange);
+    letter-spacing: 4px; margin-bottom: 20px;
+  }
+  .part-badge::before { content: '// '; color: var(--orange-dim); }
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: clamp(28px, 5vw, 58px);
+    line-height: 1.0; letter-spacing: -0.5px;
+    text-transform: uppercase; color: #ffffff; margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-family: 'Lora', serif;
+    font-style: italic; font-size: 15px;
+    color: var(--text-dim); max-width: 580px;
+  }
+
+  /* ── ARTICLE ── */
+  article {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 40px 96px;
+  }
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 500;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin: 56px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 400;
+    color: #e8ddd0; text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 36px 0 12px;
+  }
+  p { margin-bottom: 20px; font-size: 15.5px; }
+  ul, ol { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
+  li {
+    font-size: 15px; padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,154,60,0.04);
+  }
+  ul li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--orange-dim); font-size: 11px; top: 9px;
+  }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before {
+    content: counter(item) '.'; position: absolute; left: 0;
+    color: var(--orange-dim);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; top: 9px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,154,60,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 20px 24px; margin: 28px 0; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.75; color: #b8a898;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em; color: var(--orange); background: rgba(255,154,60,0.07);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  pre code { color: inherit; font-size: inherit; background: none; padding: 0; }
+  .callout {
+    margin: 28px 0; padding: 18px 22px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,154,60,0.04);
+    font-size: 14px; font-style: italic; color: var(--text-dim);
+  }
+  .callout.warn {
+    border-left-color: var(--gold);
+    background: rgba(240,192,64,0.04); color: #9a8040;
+  }
+  .callout strong { color: var(--text); font-style: normal; }
+
+  /* ── CONTRACT TABLES ── */
+  .contract-table {
+    width: 100%; border-collapse: collapse;
+    margin: 24px 0 32px; font-size: 14px;
+  }
+  .contract-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--orange-dim); text-align: left;
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    background: rgba(255,154,60,0.03);
+  }
+  .contract-table td {
+    padding: 10px 16px; vertical-align: top;
+    border-bottom: 1px solid rgba(255,154,60,0.05);
+    color: var(--text); line-height: 1.6;
+  }
+  .contract-table td:first-child {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; color: var(--orange); white-space: nowrap;
+    width: 30%;
+  }
+  .contract-table tr:last-child td { border-bottom: none; }
+
+  /* ── PROHIBITIONS TABLE ── */
+  .prohibitions-table {
+    width: 100%; border-collapse: collapse;
+    margin: 24px 0 32px; font-size: 14px;
+  }
+  .prohibitions-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    background: rgba(255,154,60,0.03); text-align: left;
+  }
+  .prohibitions-table th:first-child { color: #c84040; }
+  .prohibitions-table th:last-child { color: var(--orange-dim); }
+  .prohibitions-table td {
+    padding: 10px 16px; vertical-align: top;
+    border-bottom: 1px solid rgba(255,154,60,0.05);
+    line-height: 1.6; width: 50%;
+  }
+  .prohibitions-table td:first-child { color: #904040; }
+  .prohibitions-table td:last-child { color: var(--text-dim); }
+  .prohibitions-table tr:last-child td { border-bottom: none; }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex; align-items: center; gap: 0;
+    margin: 32px 0; flex-wrap: wrap;
+  }
+  .flow-agent {
+    flex: 1; min-width: 140px;
+    padding: 20px 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .flow-agent-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px; font-weight: 600;
+    color: var(--orange); text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .flow-agent-role {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--text-dim); letter-spacing: 1px;
+  }
+  .flow-arrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px; color: var(--orange-dim);
+    padding: 0 12px; flex-shrink: 0;
+  }
+
+  /* ── ESCALATION TABLE ── */
+  .escalation-table {
+    width: 100%; border-collapse: collapse;
+    margin: 24px 0 32px; font-size: 14px;
+  }
+  .escalation-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--orange-dim); text-align: left;
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    background: rgba(255,154,60,0.03);
+  }
+  .escalation-table td {
+    padding: 10px 16px; vertical-align: top;
+    border-bottom: 1px solid rgba(255,154,60,0.05);
+    line-height: 1.6;
+  }
+  .escalation-table td:first-child {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; color: var(--gold); white-space: nowrap; width: 35%;
+  }
+  .escalation-table tr:last-child td { border-bottom: none; }
+
+  /* ── PAGE NAV ── */
+  .page-nav {
+    position: relative; z-index: 10;
+    max-width: 900px; margin: 0 auto;
+    padding: 32px 40px 72px;
+    display: flex; justify-content: space-between; gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--orange-dim); text-decoration: none;
+    padding: 10px 18px; border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(255,154,60,0.05); }
+
+  @media (max-width: 640px) {
+    .topnav, .hero, article, .page-nav { padding-left: 20px; padding-right: 20px; }
+    .topnav-title { display: none; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-home" href="../index.html">← INDEX</a>
+  <div class="topnav-title">AI Automation Manual v3.0</div>
+  <div class="topnav-part">PART XXIV</div>
+</nav>
+
+<div class="hero">
+  <div class="part-badge">PART XXIV</div>
+  <h1>The Agent Triad</h1>
+  <div class="hero-sub">Input/output contracts for autonomous Code Volleyball — the inner loop without the human.</div>
+</div>
+
+<article>
+
+<h2>24.1  Overview</h2>
+
+<p>Part XXII described Code Volleyball as a human-orchestrated relay: you zip the project, write the next prompt, pass it to a model, review the output, zip again. The Prompt Ledger is the mechanism that makes each handoff coherent. That pattern works. It also has a ceiling — the human in the loop is both the quality gate and the bottleneck.</p>
+
+<p>The Agent Triad is what Code Volleyball becomes when you remove the human from the inner loop. Three agents cooperate to move from structural insight to built artifact without requiring human translation between them. The Ledger becomes live state. The relay becomes autonomous. The human moves from relay runner to checkpoint reviewer.</p>
+
+<div class="callout">
+  <strong>Relationship to Part XXII:</strong> The Triad does not replace the Prompt Ledger — it operationalises it. Logistics Guy's blueprint <em>is</em> the Ledger's Current Build State. The gap report <em>is</em> the Open Issues list. The task emitted to Builder <em>is</em> the Next Pass Prompt. The same structure, running without a human triggering each step.
+</div>
+
+<div class="flow">
+  <div class="flow-agent">
+    <div class="flow-agent-name">Idea Guy</div>
+    <div class="flow-agent-role">The Mendeleev Role</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-agent">
+    <div class="flow-agent-name">Logistics Guy</div>
+    <div class="flow-agent-role">The Foreman</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-agent">
+    <div class="flow-agent-name">Builder</div>
+    <div class="flow-agent-role">Deterministic Executor</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-agent" style="border-color: rgba(255,154,60,0.4);">
+    <div class="flow-agent-name" style="color: var(--gold);">Logistics Guy</div>
+    <div class="flow-agent-role">repeat</div>
+  </div>
+</div>
+
+<p>You review outputs at natural checkpoints — not at every step. The loop runs until a blocker persists, scope diverges, or a completion reveals a gap large enough to warrant human judgment.</p>
+
+<h2>24.2  Agent 1 — Idea Guy</h2>
+
+<p>The Mendeleev role. Reads the shape of existing structure. Names what is absent because the structure demands it — not because it would be useful or interesting, but because the system is incomplete without it.</p>
+
+<p><strong>Core mandate:</strong> Detect structural holes — configurations that must exist for the system to be complete — and produce exactly one, precisely specified gap report per invocation. Nothing more.</p>
+
+<h3>Input Contract</h3>
+<table class="contract-table">
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>current_structure</td><td>The existing system: entities, relations, constraints, invariants</td></tr>
+  <tr><td>known_holes</td><td>List of gaps already identified — checked before output to prevent duplication</td></tr>
+  <tr><td>focus_domain</td><td>Optional: constrain search to a specific subsystem</td></tr>
+</table>
+
+<h3>Output Contract</h3>
+<p>Exactly one gap per invocation. Output must be a structured record — not prose.</p>
+<table class="contract-table">
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>gap_id</td><td>Unique identifier (e.g. GAP-007)</td></tr>
+  <tr><td>structural_demand</td><td>The specific invariant or constraint violated by this absence</td></tr>
+  <tr><td>evidence</td><td>Which existing elements imply the missing one — cited explicitly</td></tr>
+  <tr><td>shape_of_missing</td><td>What the absent element must look like — minimum necessary specification</td></tr>
+  <tr><td>priority_signal</td><td>Why this hole creates the most tension in the current structure</td></tr>
+  <tr><td>out_of_scope</td><td>What this gap report does NOT address — prevents scope creep downstream</td></tr>
+</table>
+
+<h3>Prohibitions</h3>
+<table class="prohibitions-table">
+  <tr><th>MUST NOT</th><th>MUST</th></tr>
+  <tr><td>Produce more than one gap per invocation</td><td>Identify exactly one gap and stop</td></tr>
+  <tr><td>Generate ideas without structural justification</td><td>Every output must cite a violated invariant</td></tr>
+  <tr><td>Speculate about implementation</td><td>shape_of_missing is a spec, not a build plan</td></tr>
+  <tr><td>Restate previously identified gaps</td><td>Check known_holes before output</td></tr>
+  <tr><td>Use vague language ("we might need...")</td><td>Be precise: "constraint X is unsatisfied because Y is absent"</td></tr>
+</table>
+
+<div class="callout warn">
+  <strong>Failure mode this prevents:</strong> Idea Guy going into brainstorm mode — producing overlapping, ambiguous, or enthusiasm-driven ideas that have no structural grounding and cannot be acted upon by Builder.
+</div>
+
+<h2>24.3  Agent 2 — Logistics Guy</h2>
+
+<p>The Foreman. Speaks both languages. Translates structural gap into actionable build sequence and keeps the map updated as understanding evolves. This is the pivot agent — every message in the system passes through or is acknowledged by Logistics Guy.</p>
+
+<p><strong>Core mandate:</strong> Receive a gap report from Idea Guy. Decompose it into an ordered dependency tree of build tasks. Package tasks for Builder. Update the blueprint after each Builder completion. Surface blockers before they halt work.</p>
+
+<h3>Input Contract — From Idea Guy</h3>
+<table class="contract-table">
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>gap_report</td><td>Full structured gap record from Idea Guy</td></tr>
+  <tr><td>current_blueprint</td><td>Existing dependency map of all prior and in-progress work</td></tr>
+  <tr><td>builder_capabilities</td><td>What Builder can currently execute: languages, tools, APIs</td></tr>
+</table>
+
+<h3>Input Contract — From Builder</h3>
+<table class="contract-table">
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>task_id</td><td>Which task was completed or blocked</td></tr>
+  <tr><td>status</td><td><code>COMPLETE</code> | <code>BLOCKED</code> | <code>PARTIAL</code></td></tr>
+  <tr><td>artifact</td><td>What was produced: file path, schema, API endpoint, etc.</td></tr>
+  <tr><td>blocker_description</td><td>If BLOCKED: precise description of what is missing</td></tr>
+</table>
+
+<h3>Output Contract — To Builder</h3>
+<table class="contract-table">
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>task_id</td><td>Unique task identifier (e.g. TASK-012)</td></tr>
+  <tr><td>depends_on</td><td>List of task_ids that must be complete before this one</td></tr>
+  <tr><td>description</td><td>What to build — precise enough to execute without clarification</td></tr>
+  <tr><td>acceptance_criteria</td><td>How to verify the task is done</td></tr>
+  <tr><td>context_refs</td><td>Relevant prior artifacts or constraints to incorporate</td></tr>
+  <tr><td>expected_output</td><td>What artifact should exist when done</td></tr>
+</table>
+
+<h3>Output Contract — Blueprint Update</h3>
+<p>After each Builder completion, Logistics Guy emits an updated blueprint showing: completed nodes, open nodes, in-progress nodes, and any newly revealed dependencies. The blueprint is the ground truth of system state — equivalent to the Ledger's Current Build State in the manual relay workflow.</p>
+
+<h3>Prohibitions</h3>
+<table class="prohibitions-table">
+  <tr><th>MUST NOT</th><th>MUST</th></tr>
+  <tr><td>Pass ambiguous tasks to Builder</td><td>Every task must be self-contained and executable</td></tr>
+  <tr><td>Skip dependency ordering</td><td>No task goes to Builder before its dependencies complete</td></tr>
+  <tr><td>Invent requirements not in gap report</td><td>Decompose only what Idea Guy specified</td></tr>
+  <tr><td>Suppress blockers</td><td>Blockers must surface immediately with precise description</td></tr>
+  <tr><td>Let blueprint go stale</td><td>Update after every Builder response, no exceptions</td></tr>
+</table>
+
+<div class="callout warn">
+  <strong>Failure mode this prevents:</strong> Builder receiving tasks that are under-specified, out-of-order, or in conflict with existing structure — causing silent failures or wasted work that requires human intervention to untangle.
+</div>
+
+<h2>24.4  Agent 3 — Builder</h2>
+
+<p>Deterministic executor. Takes a well-specified task and produces an artifact. Does not interpret intent — only executes specification. The Builder's discipline is the discipline of not deciding: when something is unclear, the answer is always <code>BLOCKED</code>, never a creative interpretation.</p>
+
+<p><strong>Core mandate:</strong> Execute exactly what is specified in the task. Produce the artifact described in <code>expected_output</code>. Verify against <code>acceptance_criteria</code>. Report status with precision. Never extrapolate beyond the task boundary.</p>
+
+<h3>Input Contract</h3>
+<table class="contract-table">
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>task_id</td><td>Task identifier from Logistics Guy</td></tr>
+  <tr><td>description</td><td>What to build</td></tr>
+  <tr><td>acceptance_criteria</td><td>Done-when conditions</td></tr>
+  <tr><td>context_refs</td><td>Artifacts and constraints to incorporate</td></tr>
+  <tr><td>expected_output</td><td>What artifact to produce</td></tr>
+</table>
+
+<h3>Output Contract</h3>
+<table class="contract-table">
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>task_id</td><td>Echo the task_id — confirms correct task was executed</td></tr>
+  <tr><td>status</td><td><code>COMPLETE</code> | <code>BLOCKED</code> | <code>PARTIAL</code></td></tr>
+  <tr><td>artifact</td><td>Location or description of produced artifact</td></tr>
+  <tr><td>acceptance_verified</td><td>Confirmation that each criterion was checked — list them explicitly</td></tr>
+  <tr><td>blocker_description</td><td>If BLOCKED: what is missing — surgical, not general</td></tr>
+  <tr><td>out_of_scope_noted</td><td>Anything observed but intentionally not built — task boundary preserved</td></tr>
+</table>
+
+<h3>Prohibitions</h3>
+<table class="prohibitions-table">
+  <tr><th>MUST NOT</th><th>MUST</th></tr>
+  <tr><td>Extend scope beyond task spec</td><td>If it is not in the task, do not build it</td></tr>
+  <tr><td>Assume missing context</td><td>If context is insufficient, report BLOCKED immediately</td></tr>
+  <tr><td>Silently skip acceptance criteria</td><td>All criteria must be explicitly verified in output</td></tr>
+  <tr><td>Produce non-reproducible artifacts</td><td>Determinism required</td></tr>
+  <tr><td>Interpret ambiguous specs</td><td>Ambiguity = BLOCKED, not a creative decision</td></tr>
+</table>
+
+<div class="callout warn">
+  <strong>Failure mode this prevents:</strong> Builder silently over-building, under-building, or making interpretive decisions that invalidate the structural reasoning that originated the task — causing the gap to remain open despite apparent completion.
+</div>
+
+<h2>24.5  Handoff Rules</h2>
+
+<h3>Idea Guy → Logistics Guy</h3>
+<p>Idea Guy emits exactly one gap report. Logistics Guy acknowledges receipt and returns either a decomposed task tree or a request for clarification on exactly one ambiguous field. No gap report is acted upon until Logistics Guy has confirmed it is buildable.</p>
+
+<h3>Logistics Guy → Builder</h3>
+<p>Logistics Guy emits exactly one task at a time. Builder does not receive task N+1 until task N is <code>COMPLETE</code>. If task N is <code>BLOCKED</code>, Logistics Guy resolves the blocker — potentially requesting a new gap from Idea Guy — before reissuing.</p>
+
+<h3>Builder → Logistics Guy</h3>
+<p>Every Builder output triggers a blueprint update. Logistics Guy either issues the next task or escalates to Idea Guy if a completion reveals a new structural hole.</p>
+
+<h2>24.6  Escalation to Human</h2>
+
+<p>The Triad runs autonomously until one of four conditions is met. Each condition requires a human decision before the loop continues — not a retry, not an inference, a decision.</p>
+
+<table class="escalation-table">
+  <tr><th>Condition</th><th>Action</th></tr>
+  <tr>
+    <td>Blocker persists after 2 Logistics attempts</td>
+    <td>Surface to human with precise description of the gap. Do not attempt a third resolution.</td>
+  </tr>
+  <tr>
+    <td>New gap discovered mid-build changes scope significantly</td>
+    <td>Pause and surface to human before continuing. The original gap report is now stale.</td>
+  </tr>
+  <tr>
+    <td>Blueprint diverges from original gap report</td>
+    <td>Surface delta to human for confirmation. Do not silently absorb scope drift.</td>
+  </tr>
+  <tr>
+    <td>Acceptance criteria cannot be verified</td>
+    <td>Surface to human — do not auto-pass. An unverified criterion is a failed criterion.</td>
+  </tr>
+</table>
+
+<h2>24.7  Mapping to the Prompt Ledger</h2>
+
+<p>For teams running both the manual relay (Part XXII) and the autonomous Triad, the two systems share the same underlying structure. The Ledger is the Triad's state rendered for human readability.</p>
+
+<table class="contract-table">
+  <tr><th>Triad Concept</th><th>Ledger Equivalent (Part XXII)</th></tr>
+  <tr><td>gap_report</td><td>Open Issues entry</td></tr>
+  <tr><td>blueprint</td><td>Current Build State</td></tr>
+  <tr><td>task emitted to Builder</td><td>Next Pass Prompt</td></tr>
+  <tr><td>Builder completion</td><td>Completed in This Pass</td></tr>
+  <tr><td>escalation to human</td><td>Human review checkpoint</td></tr>
+  <tr><td>known_holes</td><td>Architecture Decisions Log (decisions already made)</td></tr>
+</table>
+
+<p>When the Triad escalates to human, the human's natural response is to write a Ledger entry — updating the blueprint, documenting the decision, and writing the next prompt. The two patterns are designed to compose, not compete.</p>
+
+<div class="callout">
+  <strong>The practical implication:</strong> You can start a build with the manual Ledger relay, hand it to the autonomous Triad when the structure is stable enough, and resume manual control at any escalation point. The state is always legible because the blueprint and the Ledger are the same document at different levels of automation.
+</div>
+
+</article>
+
+<div class="page-nav">
+  <a href="part-23.html" class="nav-btn">← PART XXIII</a>
+  <a href="addendum.html" class="nav-btn">ADDENDUM →</a>
+</div>
+
+</body>
+</html>
